@@ -197,6 +197,12 @@ def _parse_event(event: dict[str, Any]) -> Event:
             and value.tzinfo is not None
         ):
             event[key] = dt_util.as_local(value).replace(tzinfo=None)
+    # If dtstart is made floating above, UNTIL in the rrule must also be made
+    # floating to match, otherwise dateutil raises a naive/aware comparison
+    # error when expanding recurrences.
+    if (rrule_obj := event.get(EVENT_RRULE)) and isinstance(rrule_obj, Recur):
+        if isinstance(rrule_obj.until, datetime) and rrule_obj.until.tzinfo is not None:
+            rrule_obj.until = dt_util.as_local(rrule_obj.until).replace(tzinfo=None)
 
     try:
         return Event(**event)
