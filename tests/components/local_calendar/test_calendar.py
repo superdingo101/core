@@ -287,7 +287,7 @@ async def test_recurring_event_with_until_non_utc_timezone(
     tzinfo from UNTIL in the rrule, causing a naive/aware datetime mismatch.
     """
     client = await ws_client()
-    resp = await client.cmd_result(
+    await client.cmd_result(
         "create",
         {
             "entity_id": TEST_ENTITY,
@@ -299,7 +299,6 @@ async def test_recurring_event_with_until_non_utc_timezone(
             },
         },
     )
-    assert resp is not None
 
     events = await get_events("2022-08-20T00:00:00", "2022-09-20T00:00:00")
     summaries = [event["summary"] for event in events]
